@@ -120,26 +120,73 @@ Graph.prototype.Broad = function broad(start){
 		}
 	}
 }
-// 连通图 两个顶点之间路径长度为length的路径
-Graph.prototype.Road = function road(start,end){
+// 连通图 两个顶点之间的全部路径
+Graph.prototype.Roads = function roads(start,end){
 	let point = this.graph[this.graphPos[start]];
 	this.visited[start] = true;
 	this.route.push(start);
-	console.log(start);
-	let record = [];
+	if(start === end){
+		console.log(this.route.join('-'));
+		return ;
+	}
 	while(point.next){
 		point = point.next;
-		if(!this.visited[this.graph[point.pos]['value']]){
-			record.push(this.graph[point.pos]['value']);
-			deep.call(this,this.graph[point.pos]['value'],end);
+		let vertex = this.graph[point.pos];
+		if(!this.visited[vertex.value]){
+			roads.call(this,vertex.value,end);
+			this.route.pop();
+			this.visited[vertex.value] = false;
 		}
 	}
-	record.forEach((item)=>{
-		this.visited[item] = false;
-	});
+}
+//联通图 两点之长度为len的全部路径
+Graph.prototype.distanceRoads = function distanceRoads(start,end,len){
+	let point = this.graph[this.graphPos[start]];
+	this.visited[start] = true;
+	this.route.push(start);
+	if(start === end && len === 0){
+		console.log(this.route.join('-'));
+		return ;
+	}
+	while(point.next){
+		point = point.next;
+		let vertex = this.graph[point.pos];
+		if(!this.visited[vertex.value]){
+			distanceRoads.call(this,vertex.value,end,len-point.weight);
+			this.route.pop();
+			this.visited[vertex.value] = false;
+		}
+	}
+}
+
+// 判断二部图（只有两种节点，0和1，同类节点之间没有路径）
+Graph.prototype.halfGraph = function halfgraph(start){
+	if(arguments.length === 0){
+		start = 0;
+	}
+	
+
 }
 
 function main(){
+	// let vertex = ['a','b','c','d','e','f'];
+	// let graphMatrix = [
+	// [0,3,2,Infinity,1,Infinity],
+	// [3,0,Infinity,3,8,Infinity],
+	// [2,Infinity,0,7,Infinity,Infinity],
+	// [Infinity,3,7,0,Infinity,Infinity],
+	// [1,8,Infinity,Infinity,0,Infinity],
+	// [Infinity,Infinity,Infinity,Infinity,Infinity,0]
+	// ];
+	// let graph = new Graph();
+	// graph.buildMap(vertex,graphMatrix);
+	// console.log(graph);
+	// graph.Deep();
+	// graph.Broad();
+	// graph.init();
+	// graph.Roads('a','b');
+	// graph.distanceRoads('a','b',9);
+
 	let vertex = ['a','b','c','d','e','f'];
 	let graphMatrix = [
 	[0,3,2,Infinity,1,Infinity],
@@ -151,11 +198,7 @@ function main(){
 	]
 	let graph = new Graph();
 	graph.buildMap(vertex,graphMatrix);
-	console.log(graph);
-	graph.Deep();
-	graph.Broad();
 
-	graph.init();
 }
 
 
