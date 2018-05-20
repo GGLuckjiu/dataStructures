@@ -109,7 +109,6 @@ Graph.prototype.Broad = function broad(start){
 				queue.push(start.pos);
 			}
 		}
-		debugger
 		if(queue.length===0){
 			for(let item in this.visited){
 				if(!this.visited[item]){
@@ -159,13 +158,26 @@ Graph.prototype.distanceRoads = function distanceRoads(start,end,len){
 	}
 }
 
-// 判断二部图（只有两种节点，0和1，同类节点之间没有路径）
-Graph.prototype.halfGraph = function halfgraph(start){
-	if(arguments.length === 0){
-		start = 0;
-	}
-	
+// 判断二部图（连通图？非连通，只有两种节点，0和1，同类节点之间没有路径）
+Graph.prototype.halfGraph = function halfgraph(start){//start 数字
+	let _order = {},_visited={};//-1-标记 0-未访问 1-标记
+	this.graph.forEach((item,item)=>{
+		_order[item.value]=item;
+		_visited[item.value]=0;
+	});
+	let point = this.graph[start];
+	_visited[point.value] = 1;
+	let queue = [];
+	queue.push(point);
+	while(queue.length>0){
+		point = queue.pop();
+		while(point.next && _visited[point.value]===0){
+			
+			_visited[point.value] = _visited[point.value];
+			point = point.next;
 
+		}
+	}
 }
 
 function main(){
@@ -189,16 +201,15 @@ function main(){
 
 	let vertex = ['a','b','c','d','e','f'];
 	let graphMatrix = [
-	[0,3,2,Infinity,1,Infinity],
-	[3,0,Infinity,3,8,Infinity],
-	[2,Infinity,0,7,Infinity,Infinity],
-	[Infinity,3,7,0,Infinity,Infinity],
-	[1,8,Infinity,Infinity,0,Infinity],
-	[Infinity,Infinity,Infinity,Infinity,Infinity,0]
+		[0,3,2,Infinity,1,Infinity],
+		[3,0,Infinity,3,8,Infinity],
+		[2,Infinity,0,7,Infinity,Infinity],
+		[Infinity,3,7,0,Infinity,Infinity],
+		[1,8,Infinity,Infinity,0,Infinity],
+		[Infinity,Infinity,Infinity,Infinity,Infinity,0]
 	]
 	let graph = new Graph();
 	graph.buildMap(vertex,graphMatrix);
-
 }
 
 
