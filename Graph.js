@@ -196,11 +196,12 @@ Graph.prototype.halfGraph = function halfgraph(start){//start 数字
 
 // 最小生成树
 // prime算法 - 邻接矩阵方式 权重为0的是自身
-Graph.prototype.getMinCostOrder = function(arr){
-	let minOrder = 0;
+Graph.prototype._getMinCostOrder = function(arr){
+	let min = Infinity,minOrder;
 	arr.forEach((item,index)=>{
-		if(arr[index]['cost']<arr[minOrder]['cost'] && arr[index]['cost']!==0){
+		if(arr[index]['cost']<min && arr[index]['cost']!==0){
 			minOrder = index;
+			min = arr[index]['cost'];
 		}
 	});
 	return minOrder;
@@ -210,39 +211,53 @@ Graph.prototype.minPrim = function minprim(vertex,graphMatrix,start) {
 	vertex.forEach((item,index)=>{
 		template.push({
 			name:item,
-			cost:graphMatrix[start][0]
+			cost:graphMatrix[0][index],
+			link:vertex[start]
 		});
 	});
 	for(let i=1,len=vertex.length;i<len;i++){
-		let minOrder = this.getMinCostOrder(template);
-		console.log(start,'-',template[minOrder]['name'],'-',template[minOrder]['cost']);
+		let minOrder = this._getMinCostOrder(template);
+		console.log(template[minOrder]['link'],'->',template[minOrder]['name'],'-',template[minOrder]['cost']);
 		template[minOrder]['cost'] = 0;
 		for(let j=0;j<len;j++){
 			if(graphMatrix[j][minOrder]<template[j]['cost']){
 				template[j]['cost'] = graphMatrix[j][minOrder];
+				template[j]['link'] = vertex[j];
 			}
 		}
 	}
 }
 
 function main(){
+	// let vertex = ['a','b','c','d','e','f'];
+	// let graphMatrix = [
+	// [0,3,2,Infinity,1,Infinity],
+	// [3,0,Infinity,3,8,Infinity],
+	// [2,Infinity,0,7,Infinity,Infinity],
+	// [Infinity,3,7,0,Infinity,Infinity],
+	// [1,8,Infinity,Infinity,0,Infinity],
+	// [Infinity,Infinity,Infinity,Infinity,Infinity,0]
+	// ];
+	// let graph = new Graph();
+	// graph.buildMap(vertex,graphMatrix);
+	// console.log(graph);
+	// graph.Deep();
+	// graph.Broad();
+	// graph.init();
+	// graph.Roads('a','b');
+	// graph.distanceRoads('a','b',9);
+
 	let vertex = ['a','b','c','d','e','f'];
 	let graphMatrix = [
-	[0,3,2,Infinity,1,Infinity],
-	[3,0,Infinity,3,8,Infinity],
-	[2,Infinity,0,7,Infinity,Infinity],
-	[Infinity,3,7,0,Infinity,Infinity],
-	[1,8,Infinity,Infinity,0,Infinity],
-	[Infinity,Infinity,Infinity,Infinity,Infinity,0]
+		[0,1,Infinity,Infinity,Infinity,3],
+		[1,0,2,Infinity,3,Infinity],
+		[Infinity,2,0,3,Infinity,1],
+		[Infinity,Infinity,3,0,2,Infinity],
+		[Infinity,3,Infinity,2,0,1],
+		[3,Infinity,1,Infinity,1,0]
 	];
 	let graph = new Graph();
-	graph.buildMap(vertex,graphMatrix);
-	console.log(graph);
-	graph.Deep();
-	graph.Broad();
-	graph.init();
-	graph.Roads('a','b');
-	graph.distanceRoads('a','b',9);
+	graph.minPrim(vertex,graphMatrix,0);
 }
 
 
