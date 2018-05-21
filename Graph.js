@@ -114,6 +114,8 @@ Graph.prototype.Broad = function broad(start){
 				if(!this.visited[item]){
 					this.visited[item] = true;
 					queue.push(_order[item]);
+					// 这里应该一个个添加
+					break;
 				}
 			}
 		}
@@ -171,45 +173,76 @@ Graph.prototype.halfGraph = function halfgraph(start){//start 数字
 	queue.push(point);
 	while(queue.length>0){
 		point = queue.pop();
-		while(point.next && _visited[point.value]===0){
-			
-			_visited[point.value] = _visited[point.value];
-			point = point.next;
+		let status = _visited[point.value];
+		while(point.next){
+			if(_visited[point.next.value]===0){
+				point = point.next;
+				_visited[point.value] = -(status);
+			}else if(_visited[point.next.value] === point){
+				return false;
+			}
+		}
+		if(queue.length===0){
+			for(let key in _visited){
+				if(_visited[key]===0){
+					queue.push(this.graph[_order[key]]);
+					break;
+				}
+			}
+		}
+	}
+	return true;
+}
 
+// 最小生成树
+// prime算法 - 邻接矩阵方式 权重为0的是自身
+Graph.prototype.getMinCostOrder = function(arr){
+	let minOrder = 0;
+	arr.forEach((item,index)=>{
+		if(arr[index]['cost']<arr[minOrder]['cost'] && arr[index]['cost']!==0){
+			minOrder = index;
+		}
+	});
+	return minOrder;
+}
+Graph.prototype.minPrim = function minprim(vertex,graphMatrix,start) {
+	let template = [];//{name:'a',cost:1}
+	vertex.forEach((item,index)=>{
+		template.push({
+			name:item,
+			cost:graphMatrix[start][0]
+		});
+	});
+	for(let i=1,len=vertex.length;i<len;i++){
+		let minOrder = this.getMinCostOrder(template);
+		console.log(start,'-',template[minOrder]['name'],'-',template[minOrder]['cost']);
+		template[minOrder]['cost'] = 0;
+		for(let j=0;j<len;j++){
+			if(graphMatrix[j][minOrder]<template[j]['cost']){
+				template[j]['cost'] = graphMatrix[j][minOrder];
+			}
 		}
 	}
 }
 
 function main(){
-	// let vertex = ['a','b','c','d','e','f'];
-	// let graphMatrix = [
-	// [0,3,2,Infinity,1,Infinity],
-	// [3,0,Infinity,3,8,Infinity],
-	// [2,Infinity,0,7,Infinity,Infinity],
-	// [Infinity,3,7,0,Infinity,Infinity],
-	// [1,8,Infinity,Infinity,0,Infinity],
-	// [Infinity,Infinity,Infinity,Infinity,Infinity,0]
-	// ];
-	// let graph = new Graph();
-	// graph.buildMap(vertex,graphMatrix);
-	// console.log(graph);
-	// graph.Deep();
-	// graph.Broad();
-	// graph.init();
-	// graph.Roads('a','b');
-	// graph.distanceRoads('a','b',9);
-
 	let vertex = ['a','b','c','d','e','f'];
 	let graphMatrix = [
-		[0,3,2,Infinity,1,Infinity],
-		[3,0,Infinity,3,8,Infinity],
-		[2,Infinity,0,7,Infinity,Infinity],
-		[Infinity,3,7,0,Infinity,Infinity],
-		[1,8,Infinity,Infinity,0,Infinity],
-		[Infinity,Infinity,Infinity,Infinity,Infinity,0]
-	]
+	[0,3,2,Infinity,1,Infinity],
+	[3,0,Infinity,3,8,Infinity],
+	[2,Infinity,0,7,Infinity,Infinity],
+	[Infinity,3,7,0,Infinity,Infinity],
+	[1,8,Infinity,Infinity,0,Infinity],
+	[Infinity,Infinity,Infinity,Infinity,Infinity,0]
+	];
 	let graph = new Graph();
 	graph.buildMap(vertex,graphMatrix);
+	console.log(graph);
+	graph.Deep();
+	graph.Broad();
+	graph.init();
+	graph.Roads('a','b');
+	graph.distanceRoads('a','b',9);
 }
 
 
