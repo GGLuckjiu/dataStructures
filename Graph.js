@@ -228,20 +228,45 @@ Graph.prototype.matrixPrim = function matrixprim(vertex,graphMatrix,start) {
 	}
 }
 // prime算法 - 邻接表方式 权重为0的是自身
+Graph.prototype._getMinCostOrder = function(arr){
+	let min = Infinity,minPos;
+	arr.forEach((item,index)=>{
+		if(item.cost<min && item.cost!==0){
+			minPos = index;
+			min = item.cost;
+		}
+	});
+	return minPos;
+}
 Graph.prototype.linkPrim = function linkPrim(start){
-	let template = Object.assign({},this.graph);
+	let template = Object.assign([],this.graph);
 	let vertex = template[start];
 	vertex.cost = 0;
 	while(vertex.next){
-		let posPoint = vertex.next;
-		template[posPoint.pos].cost = posPoint.weight;
+		vertex = vertex.next;
+		template[vertex.pos].cost = vertex.weight;
 	}
-	template.forEach((item)=>{
+	template.forEach((item,index)=>{
 		if(item.cost===undefined){
 			item.cost = Infinity;
 		}
+		item.from = start;
 	});
-	
+	let minPos = this._getMinCostOrder(template);
+	for(let i=1,len=template.length;i<len;i++){
+		let minVertex = template[minPos];
+
+		console.log(template[minVertex.from]['value'],'->',minVertex.value,minVertex.cost);
+		minVertex.cost = 0;
+		while(minVertex.next){
+			minVertex = minVertex.next;
+			let weight = minVertex.weight;
+			if(weight<template[minVertex.pos].cost){
+				template[minVertex.pos].cost = weight;
+				template[minVertex.pos].from = minVertex.pos;
+			}
+		}
+	}
 }
 function main(){
 	// let vertex = ['a','b','c','d','e','f'];
@@ -272,6 +297,9 @@ function main(){
 		[3,Infinity,1,Infinity,1,0]
 	];
 	let graph = new Graph();
+	graph.buildMap(vertex,graphMatrix);
+	graph.linkPrim(0);
+	console.log(123);
 	graph.matrixPrim(vertex,graphMatrix,0);
 }
 
